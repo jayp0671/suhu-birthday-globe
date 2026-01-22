@@ -382,16 +382,15 @@ useEffect(() => {
       </div>
 
       {/* GLOBE */}
-      <div className="relative z-10">
-        <Globe
-          ref={globeRef}
-          style={{ display: "block" }}
-          width={dims.w || 800}
-          height={dims.h || 600}
-          globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-          backgroundColor="rgba(0,0,0,0)"
-          atmosphereColor="white"
-          atmosphereAltitude={0.18}
+      <div style={{ display: "block" }}>
+  <Globe
+    ref={globeRef}
+    width={dims.w || 800}
+    height={dims.h || 600}
+    globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+    backgroundColor="rgba(0,0,0,0)"
+    atmosphereColor="#3a228a"
+    atmosphereAltitude={0.25}
           // keep cinematic + prevents user knocking it off-axis
           enablePointerInteraction={false}
           // Marker only during CELEBRATE
