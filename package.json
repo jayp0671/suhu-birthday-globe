@@ -1,0 +1,33 @@
+{
+  "name": "suhu-birthday-globe",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "framer-motion": "^12.27.5",
+    "luxon": "^3.7.2",
+    "next": "16.1.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-globe.gl": "^2.37.0",
+    "three": "^0.182.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.182.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
