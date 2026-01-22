@@ -2,10 +2,10 @@
 
 import confetti from "canvas-confetti";
 import { useEffect } from "react";
-import { STOPS } from "../lib/stops";
+import { STOPS, type Stop } from "../lib/stops";
 
 export default function CelebrationScene({ index }: { index: number }) {
-  const stop = STOPS[index];
+  const stop: Stop = STOPS[index];
 
   useEffect(() => {
     confetti({ particleCount: 180, spread: 90, origin: { y: 0.6 } });
@@ -22,9 +22,7 @@ export default function CelebrationScene({ index }: { index: number }) {
     >
       <div className="backdrop-blur-md bg-black/40 p-10 rounded-xl text-center">
         <h1 className="text-5xl font-bold">HAPPY BIRTHDAY</h1>
-        <p className="text-2xl mt-4">
-          from {stop.name}
-        </p>
+        <p className="text-2xl mt-4">from {stop.name}</p>
       </div>
     </div>
   );
