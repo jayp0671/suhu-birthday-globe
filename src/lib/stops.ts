@@ -1,3 +1,12 @@
+export type Stop = {
+  tz: string;
+  name: string;
+  flag: string;
+  lat: number;
+  lon: number;
+  bg?: string; // optional background image
+};
+
 export const STOPS = [
   // UTC +14
   { tz: "Pacific/Kiritimati", name: "Kiribati (Line Islands)", flag: "🇰🇮", lat: 1.87, lon: -157.43 },

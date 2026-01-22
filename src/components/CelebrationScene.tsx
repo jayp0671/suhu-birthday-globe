@@ -15,7 +15,7 @@ export default function CelebrationScene({ index }: { index: number }) {
     <div
       className="absolute inset-0 flex items-center justify-center text-white"
       style={{
-        backgroundImage: `url(${stop.bg})`,
+        backgroundImage: stop.bg ? `url(${stop.bg})` : undefined,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
