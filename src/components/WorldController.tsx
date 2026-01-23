@@ -188,7 +188,7 @@ export default function WorldController() {
                     {state.done
   ? "IN 2027 🌍"
   : nextStop
-    ? `Next: ${nextStop.name}`
+    ? `Celebrating Worldwide!`
     : "Next: —"}
                   </div>
                   <div style={{ marginTop: 8, fontSize: 14, opacity: 0.85 }}>
@@ -267,7 +267,7 @@ export default function WorldController() {
                 </motion.div>
 
                 <div style={{ marginTop: 8, fontSize: 14, opacity: 0.85 }}>
-                  Confetti + zoom-in moment ✨
+                  HAPPY BIRTHDAY MY LOVE
                 </div>
               </motion.div>
             )}
