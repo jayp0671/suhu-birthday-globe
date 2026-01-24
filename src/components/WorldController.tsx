@@ -132,7 +132,7 @@ export default function WorldController() {
           GLOBAL BIRTHDAY BROADCAST
         </div>
         <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600, opacity: 0.95 }}>
-          January 24, 2026
+          Midnight Run - Replay
         </div>
       </div>
 
@@ -188,7 +188,7 @@ export default function WorldController() {
                     {state.done
   ? "IN 2027 🌍"
   : nextStop
-    ? `Celebrating Worldwide!`
+    ? `Next stop: ${nextStop.name}`
     : "Next: —"}
                   </div>
                   <div style={{ marginTop: 8, fontSize: 14, opacity: 0.85 }}>
@@ -254,7 +254,7 @@ export default function WorldController() {
                   transition={{ duration: 0.6, ease: "easeOut", delay: 0.08 }}
                   style={{ marginTop: 10, fontSize: 40, fontWeight: 900, textShadow: "0 0 22px rgba(255,170,200,0.22)" }}
                 >
-                  HAPPY BIRTHDAY
+                  HAPPY BIRTHDAY SUHU
                 </motion.div>
 
                 <motion.div

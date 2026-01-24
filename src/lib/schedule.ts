@@ -1,13 +1,28 @@
 import { STOPS } from "./stops";
 
 /**
+ * -----------------------------
+ * TOGGLE INFINITE LOOP HERE
+ * -----------------------------
+ * true  = infinite loop (demo/testing)
+ * false = real Jan 24, 2026 schedule
+ */
+const LOOP_MODE = true;
+
+/**
+ * LOOP MODE timings (in ms)
+ * Globe phase runs, then celebrate phase runs, repeat forever.
+ */
+const LOOP_GLOBE_MS = 45_000;     // 45 seconds on globe
+const LOOP_CELEBRATE_MS = 15_000; // 15 seconds celebrate
+
+/**
+ * REAL MODE:
  * ONLY celebrate on the date Suhu turns 21:
  * Each stop triggers when its LOCAL clock reaches:
- * 2026-01-24 00:00:00 (midnight starting Jan 24) in that stop's timezone.
- *
- * Celebrate window length:
+ * 2026-01-24 00:00:00 in that stop's timezone.
  */
-export const CELEBRATE_MS = 5 * 60 * 1000; // 5 minutes (change if you want)
+export const CELEBRATE_MS = 5 * 60 * 1000; // 5 minutes (real mode)
 
 // The target local date (midnight at start of this date in each TZ)
 const TARGET_Y = 2026;
@@ -23,7 +38,7 @@ export type WorldState = {
   done: boolean;
 };
 
-// ---------- helpers ----------
+// ---------- helpers (REAL MODE) ----------
 
 function getOffsetMinutes(timeZone: string, at: Date): number {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -49,11 +64,17 @@ function getOffsetMinutes(timeZone: string, at: Date): number {
  * to an absolute UTC ms timestamp.
  * Uses a small refinement loop to handle DST correctly.
  */
-function utcMsForLocalMidnight(timeZone: string, y: number, m: number, d: number): number {
+function utcMsForLocalMidnight(
+  timeZone: string,
+  y: number,
+  m: number,
+  d: number
+): number {
   // start with "naive" UTC midnight then shift by tz offset
   const guess = Date.UTC(y, m - 1, d, 0, 0, 0);
 
-  let utc = guess - getOffsetMinutes(timeZone, new Date()) * 60_000;
+  // NOTE: this line must use offset at the guessed instant, not "now"
+  let utc = guess - getOffsetMinutes(timeZone, new Date(guess)) * 60_000;
 
   // refine offset at that instant (DST-safe)
   for (let i = 0; i < 4; i++) {
@@ -66,18 +87,50 @@ function utcMsForLocalMidnight(timeZone: string, y: number, m: number, d: number
   return utc;
 }
 
-// ---------- main ----------
+// ---------- LOOP MODE core ----------
 
-export function computeWorldState(): WorldState {
+function computeLoopState(): WorldState {
+  const total = STOPS.length;
+  if (total === 0) {
+    return {
+      activeIndex: 0,
+      nextIndex: 0,
+      phase: "GLOBE",
+      nextInMs: 0,
+      phaseTotalMs: 1,
+      done: false,
+    };
+  }
+
+  const cycle = LOOP_GLOBE_MS + LOOP_CELEBRATE_MS;
+  const t = Date.now() % cycle;
+
+  const cycleIndex = Math.floor(Date.now() / cycle) % total;
+  const activeIndex = cycleIndex;
+  const nextIndex = (cycleIndex + 1) % total;
+
+  const phase: "GLOBE" | "CELEBRATE" = t < LOOP_GLOBE_MS ? "GLOBE" : "CELEBRATE";
+
+  const nextInMs =
+    phase === "GLOBE" ? LOOP_GLOBE_MS - t : cycle - t;
+
+  const phaseTotalMs = phase === "GLOBE" ? LOOP_GLOBE_MS : LOOP_CELEBRATE_MS;
+
+  return {
+    activeIndex,
+    nextIndex,
+    phase,
+    nextInMs: Math.max(0, nextInMs),
+    phaseTotalMs,
+    done: false, // never done in loop mode
+  };
+}
+
+// ---------- REAL MODE core ----------
+
+function computeRealState(): WorldState {
   const total = STOPS.length;
   const nowMs = Date.now();
-
-  console.log(
-  "Kiribati fires at:",
-  new Date(
-    utcMsForLocalMidnight(STOPS[0].tz, 2026, 1, 24)
-  ).toUTCString()
-);
 
   if (total === 0) {
     return {
@@ -100,19 +153,20 @@ export function computeWorldState(): WorldState {
   const firstAt = events[0].startAt;
   const lastEnd = events[events.length - 1].endAt;
 
-  // ✅ Before the wave starts anywhere: show globe, countdown to first event
+  // Before the wave starts anywhere: show globe, countdown to first event
   if (nowMs < firstAt) {
+    const until = firstAt - nowMs;
     return {
       activeIndex: events[0].idx,
       nextIndex: events[0].idx,
       phase: "GLOBE",
-      nextInMs: firstAt - nowMs,
-      phaseTotalMs: Math.max(1, firstAt - nowMs),
+      nextInMs: until,
+      phaseTotalMs: Math.max(1, until),
       done: false,
     };
   }
 
-  // ✅ After the entire wave is finished: DONE (spin forever)
+  // After the entire wave is finished: DONE (spin forever)
   if (nowMs >= lastEnd) {
     const lastIdx = events[events.length - 1].idx;
     return {
@@ -125,7 +179,7 @@ export function computeWorldState(): WorldState {
     };
   }
 
-  // ✅ During the wave: find if we are inside any celebrate window
+  // During the wave: find if we are inside any celebrate window
   for (let i = 0; i < events.length; i++) {
     const e = events[i];
     if (nowMs >= e.startAt && nowMs < e.endAt) {
@@ -141,10 +195,9 @@ export function computeWorldState(): WorldState {
     }
   }
 
-  // ✅ Between celebrations: globe phase until the next event
+  // Between celebrations: globe phase until the next event
   const nextEvent = events.find((e) => e.startAt > nowMs)!;
   const prevEvent = [...events].reverse().find((e) => e.startAt <= nowMs)!;
-
   const untilNext = Math.max(0, nextEvent.startAt - nowMs);
 
   return {
@@ -155,4 +208,11 @@ export function computeWorldState(): WorldState {
     phaseTotalMs: Math.max(1, untilNext),
     done: false,
   };
+}
+
+// ---------- main ----------
+
+export function computeWorldState(): WorldState {
+  if (LOOP_MODE) return computeLoopState();
+  return computeRealState();
 }
